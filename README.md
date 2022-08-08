@@ -1,12 +1,12 @@
 # github-tooling
 
 ## volttron-core
-[![Pytests - develop](https://github.com/VOLTTRON/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=develop)](https://github.com/VOLTTRON/volttron-core/actions/workflows/run-tests.yml)
-[![Pytests - main](https://github.com/VOLTTRON/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/VOLTTRON/volttron-core/actions/workflows/run-tests.yml)
+[![Pytests - develop](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=develop)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml)
+[![Pytests - main](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml)
 [![pypi version](https://img.shields.io/pypi/v/volttron.svg)](https://pypi.org/project/volttron-core/)
 
 ## volttron-testing
-[![Run Pytests](https://github.com/VOLTTRON/volttron-testing/actions/workflows/run-tests.yml/badge.svg)](https://github.com/VOLTTRON/volttron-testing/actions/workflows/run-tests.yml)
+[![Run Pytests](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml/badge.svg)](https://github.com/VOLTTRON/volttron-testing/actions/workflows/run-tests.yml)
 [![pypi version](https://img.shields.io/pypi/v/volttron-testing.svg)](https://pypi.org/project/volttron-testing/)
 
 
