@@ -20,7 +20,7 @@ defaults:
 env:
   LANG: en_US.utf-8
   LC_ALL: en_US.utf-8
-  PYTHON_VERSION: '3.8'
+  PYTHON_VERSION: '3.10'
   PROJECT_NAME: volttron-core
 
 jobs:
@@ -56,7 +56,7 @@ jobs:
       - name: Install Poetry
         uses: snok/install-poetry@v1
         with:
-          version: 1.2.0b2
+          version: 1.2.2
           virtualenvs-create: true
           virtualenvs-in-project: true
           installer-parallel: true
