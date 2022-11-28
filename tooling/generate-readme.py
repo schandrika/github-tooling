@@ -10,12 +10,12 @@ repositories = [
 # github-tooling
 
 ## volttron-core
-# [![Pytests - develop](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=develop)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml)
-# [![Pytests - main](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml)
+# [![Pytests - develop](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=develop)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml?query=branch%3Adevelop++)
+# [![Pytests - main](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml?query=branch%3Amain++)
 # [![pypi version](https://img.shields.io/pypi/v/volttron.svg)](https://pypi.org/project/volttron-core/)
 
 ## volttron-testing
-# [![Run Pytests](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml/badge.svg)](https://github.com/VOLTTRON/volttron-testing/actions/workflows/run-tests.yml)
+# [![Run Pytests - develop](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml?query=branch%3Adevelop++)
 # [![pypi version](https://img.shields.io/pypi/v/volttron-testing.svg)](https://pypi.org/project/volttron-testing/)
 
     {'repo': 'volttron-core', 'pypi_name': 'volttron'},
@@ -23,8 +23,8 @@ repositories = [
     'volttron-platform-driver',
     'volttron-lib-base-driver',
     'volttron-lib-fake-driver',
-    'volttron-lib-bacnet-driver',
-    'volttron-lib-actuator',
+    # 'volttron-lib-bacnet-driver',
+    # 'volttron-lib-actuator',
     'volttron-lib-historian-base',
     'volttron-lib-sql-historian',
     'volttron-lib-historian-sqlite',
@@ -50,7 +50,7 @@ repositories = [
 ]
 
 link_pypi = '[![pypi version](https://img.shields.io/pypi/v/{repo}.svg)](https://pypi.org/project/{repo}/)'
-link_pytest = '[![Run Pytests](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml)'
+link_pytest = '[![Run Pytests - develop](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=branch%3Adevelop++)'
 # link_pytest = '[![Run Pytests](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml)'
 
 with open(readme_path, 'w') as fp:
