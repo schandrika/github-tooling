@@ -6,52 +6,35 @@ readme_path = Path(__file__).resolve().parent.parent.joinpath("README.md")
 preamble = """
 VOLTTRON™ is an open source platform for distributed sensing and control. The platform provides services for collecting and storing data from buildings and devices and provides an environment for developing applications which interact with that data.
 """
+
 repositories = [
-# github-tooling
-
-## volttron-core
-# [![Pytests - develop](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=develop)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml?query=branch%3Adevelop++)
-# [![Pytests - main](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml?query=branch%3Amain++)
-# [![pypi version](https://img.shields.io/pypi/v/volttron.svg)](https://pypi.org/project/volttron-core/)
-
-## volttron-testing
-# [![Run Pytests - develop](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/volttron-testing/actions/workflows/run-tests.yml?query=branch%3Adevelop++)
-# [![pypi version](https://img.shields.io/pypi/v/volttron-testing.svg)](https://pypi.org/project/volttron-testing/)
-
     {'repo': 'volttron-core', 'pypi_name': 'volttron'},
     'volttron-testing',
+    'volttron-listener',
     'volttron-platform-driver',
     'volttron-lib-base-driver',
     'volttron-lib-fake-driver',
+    'volttron-lib-base-historian',
+    'volttron-lib-sql-historian',
+    'volttron-sqlite-historian',
+    'volttron-lib-web',
+    
+    # Uncomment the packages below once they are published to PyPi and ready for general release
+
     # 'volttron-lib-bacnet-driver',
     # 'volttron-lib-actuator',
-    'volttron-lib-historian-base',
-    'volttron-lib-sql-historian',
-    'volttron-lib-historian-sqlite',
-    'volttron-lib-historian-postgres',
-    
-
-## volttron-openadr-ven
-
-## volttron-2030_5
-
-## volttron-listener
-
-## volttron-actuator
-
-## volttron-web-service
-
-## volttron-auth-service
-
-## volttron-zmq-service
-
-## volttron-rmq-service
-
+    # 'volttron-lib-historian-postgres',
+    # 'volttron-openadr-ven',
+    # 'volttron-2030_5',
+    # 'volttron-actuator',
+    # 'volttron-web-service',
+    # 'volttron-auth-service',
+    # 'volttron-zmq-service',
+    # 'volttron-rmq-service',
 ]
 
 link_pypi = '[![pypi version](https://img.shields.io/pypi/v/{repo}.svg)](https://pypi.org/project/{repo}/)'
-link_pytest = '[![Run Pytests - develop](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=branch%3Adevelop++)'
-# link_pytest = '[![Run Pytests](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml)'
+link_pytest = '[![Run Pytests develop](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=branch%3Adevelop++)'
 
 with open(readme_path, 'w') as fp:
     fp.write(preamble)
