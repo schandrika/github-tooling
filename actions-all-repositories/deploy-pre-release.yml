@@ -14,7 +14,7 @@ env:
   LANG: en_US.utf-8
   LC_ALL: en_US.utf-8
   PYTHON_VERSION: '3.10'
-  PROJECT_NAME: test-release-actions
+  OWNER: eclipse-volttron
   RUNS_ON: ubuntu-22.04
   POETRY_VERSION: '1.2.2'
 
@@ -121,7 +121,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish pre-release to pypi
-        if: github.repository == "eclipse-volttron/${{env.PROJECT_NAME}}"
+        if: github.repository_owner == "${{env.OWNER}}"
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish
