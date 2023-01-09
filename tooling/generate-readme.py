@@ -20,14 +20,18 @@ repositories = [
     'volttron-lib-base-historian',
     'volttron-lib-sql-historian',
     'volttron-sqlite-historian',
-    'volttron-lib-web'
-        
+    'volttron-lib-web',
+    'volttron-bacnet-proxy',
+    'volttron-lib-bacnet-driver',
+
     # Uncomment the packages below once they are published to PyPi and ready for general release
 
-    # 'volttron-lib-bacnet-driver',
     # 'volttron-lib-actuator',
-    # 'volttron-lib-historian-postgres',
     # 'volttron-openadr-ven',
+    
+    
+    # Uncomment the packages below once they are published to PyPi and ready for general release
+    # 'volttron-lib-historian-postgres',
     # 'volttron-2030_5',
     # 'volttron-actuator',
     # 'volttron-web-service',
