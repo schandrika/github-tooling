@@ -11,15 +11,20 @@ repositories = [
     {'repo': 'volttron-core', 'pypi_name': 'volttron'},
     'volttron-testing',
     'volttron-listener',
+    'volttron-actuator',
     'volttron-platform-driver',
     'volttron-lib-base-driver',
     'volttron-lib-fake-driver',
+    'volttron-lib-bacnet-driver',
+    'volttron-bacnet-proxy',
     'volttron-lib-base-historian',
     'volttron-lib-sql-historian',
     'volttron-sqlite-historian',
     'volttron-lib-web',
     'volttron-bacnet-proxy',
     'volttron-lib-bacnet-driver',
+
+    # Uncomment the packages below once they are published to PyPi and ready for general release
 
     # 'volttron-lib-actuator',
     # 'volttron-openadr-ven',
