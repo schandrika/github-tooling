@@ -222,7 +222,7 @@ jobs:
           POETRY_PUBLISH_OPTIONS= "-r test-pypi"
           echo "POETRY_PUBLISH_OPTIONS=$(echo ${POETRY_PUBLISH_OPTIONS})" >> $GITHUB_ENV
 
-      - name: Publish to test pypi
+      - name: Publish to pypi/test-pypi
         id: publish-to-pypi
         run: |
           echo "${env.POETRY_PUBLISH_OPTIONS}"
