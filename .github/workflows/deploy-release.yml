@@ -224,18 +224,18 @@ jobs:
         continue-on-error: true
 
       - name: Publish to test-pypi
-        id: publish-to-pypi
+        id: publish-to-test-pypi
         if: ${{ inputs.publish-to-test-pypi  }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
-          poetry publish -r test-pypi
+          poetry publish -r test-pypi2
         continue-on-error: true
 
       - name: if publish to pypi failed revert main and delete release branch
-        if: steps.publish-to-pypi.outcome != 'success'
+        if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
         run: |
-          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }}"
+          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }} ${{ steps.publish-to-test--pypi.outcome }}"
           git reset --hard HEAD~1 
           git push origin HEAD --force
           git branch -d releases/${NEW_TAG}
