@@ -214,7 +214,7 @@ jobs:
           tag: ${{ env.NEW_TAG }}
           token: ${{ secrets.git-token }}
 
-      - run: echo "POETRY_PUBLISH_OPTIONS='')" >> $GITHUB_ENV
+      - run: echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
 
       - name: Publish to test pypi
         if: ${{ inputs.publish-to-test-pypi }}
