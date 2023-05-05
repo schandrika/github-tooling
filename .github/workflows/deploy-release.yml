@@ -56,10 +56,20 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
-      - name: Setup to publish to pypi
+      - name: Setup to publish to pypi - check for str
         if: ${{ inputs.publish-to-test-pypi == 'false' }}
         run: |
-          echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
+          echo ${{ inputs.publish-to-test-pypi }}
+
+      - name: Setup to publish to pypi - check for bool
+        if: ${{ inputs.publish-to-test-pypi  }}
+        run: |
+          echo ${{ inputs.publish-to-test-pypi }}
+
+      - name: Setup to publish to pypi - check for bool not
+        if: ${{ ! inputs.publish-to-test-pypi  }}
+        run: |
+          echo ${{ inputs.publish-to-test-pypi }}
 
       - name: test
         run: |
