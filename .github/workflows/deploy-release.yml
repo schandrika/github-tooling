@@ -58,7 +58,7 @@ jobs:
 
       - name: test
         run: |
-          echo ${{ inputs }}
+          echo ${{ inputs.publish-to-test-pypi }}
           exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
