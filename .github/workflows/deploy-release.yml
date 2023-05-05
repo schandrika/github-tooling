@@ -214,9 +214,13 @@ jobs:
           tag: ${{ env.NEW_TAG }}
           token: ${{ secrets.git-token }}
 
-      - run: echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
+      - name: Setup to publish to pypi
+        if: ! ${{ inputs.publish-to-test-pypi }}
+        run: |
+          echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
+          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
 
-      - name: Publish to test pypi
+      - name: Setup to publish to test pypi
         if: ${{ inputs.publish-to-test-pypi }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
@@ -227,7 +231,7 @@ jobs:
       - name: Publish to pypi/test-pypi
         id: publish-to-pypi
         run: |
-          echo "${env.POETRY_PUBLISH_OPTIONS}"
+          echo "${POETRY_PUBLISH_OPTIONS}"
           exit 1
           #poetry publish -r test-pypi
         continue-on-error: true
