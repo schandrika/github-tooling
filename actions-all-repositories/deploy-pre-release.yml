@@ -14,13 +14,14 @@ env:
   LANG: en_US.utf-8
   LC_ALL: en_US.utf-8
   PYTHON_VERSION: '3.10'
-  OWNER: eclipse-volttron
+  PROJECT_NAME: test-release-actions
+  RUNS_ON: ubuntu-22.04
   POETRY_VERSION: '1.2.2'
 
 jobs:
 
   deploy-pre-release:
-    runs-on: ubuntu-22.04
+    runs-on: ${{env.RUNS_ON}}
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -120,7 +121,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish pre-release to pypi
-        if: github.repository_owner == "${{env.OWNER}}"
+        if: github.repository == "eclipse-volttron/${{env.PROJECT_NAME}}"
         run: |
           poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
           poetry publish
