@@ -56,6 +56,11 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
+      - name: Setup to publish to pypi
+        if: ${{ inputs.publish-to-test-pypi == 'false' }}
+        run: |
+          echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
+
       - name: test
         run: |
           echo ${{ inputs.publish-to-test-pypi }}
@@ -219,13 +224,13 @@ jobs:
           token: ${{ secrets.git-token }}
 
       - name: Setup to publish to pypi
-        if: github.event.inputs.publish-to-test-pypi == 'false'
+        if: ${{ inputs.publish-to-test-pypi == 'false' }}
         run: |
           echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
           poetry config pypi-token.pypi ${{ secrets.pypi-token }}
 
       - name: Setup to publish to test pypi
-        if:  github.event.inputs.publish-to-test-pypi == 'true'
+        if: ${{  inputs.publish-to-test-pypi == 'true' }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
