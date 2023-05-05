@@ -215,13 +215,13 @@ jobs:
           token: ${{ secrets.git-token }}
 
       - name: Setup to publish to pypi
-        if: ! ${{ inputs.publish-to-test-pypi }}
+        if: inputs.publish-to-test-pypi == 'false'
         run: |
           echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
           poetry config pypi-token.pypi ${{ secrets.pypi-token }}
 
       - name: Setup to publish to test pypi
-        if: ${{ inputs.publish-to-test-pypi }}
+        if:  inputs.publish-to-test-pypi == 'true'
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
