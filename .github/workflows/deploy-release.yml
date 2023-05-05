@@ -56,25 +56,6 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
-      - name: Setup to publish to pypi - check for str
-        if: ${{ inputs.publish-to-test-pypi == 'false' }}
-        run: |
-          echo ${{ inputs.publish-to-test-pypi }}
-
-      - name: Setup to publish to pypi - check for bool
-        if: ${{ inputs.publish-to-test-pypi  }}
-        run: |
-          echo ${{ inputs.publish-to-test-pypi }}
-
-      - name: Setup to publish to pypi - check for bool not
-        if: ${{ ! inputs.publish-to-test-pypi  }}
-        run: |
-          echo ${{ inputs.publish-to-test-pypi }}
-
-      - name: test
-        run: |
-          echo ${{ inputs.publish-to-test-pypi }}
-          exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
@@ -233,26 +214,22 @@ jobs:
           tag: ${{ env.NEW_TAG }}
           token: ${{ secrets.git-token }}
 
-      - name: Setup to publish to pypi
-        if: ${{ inputs.publish-to-test-pypi == 'false' }}
+      - name: Publish to pypi
+        id: publish-to-pypi
+        if: ${{ ! inputs.publish-to-test-pypi }}
         run: |
           echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
           poetry config pypi-token.pypi ${{ secrets.pypi-token }}
+          poetry publish
+        continue-on-error: true
 
-      - name: Setup to publish to test pypi
-        if: ${{  inputs.publish-to-test-pypi == 'true' }}
+      - name: Publish to test-pypi
+        id: publish-to-pypi
+        if: ${{ inputs.publish-to-test-pypi  }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
-          POETRY_PUBLISH_OPTIONS= "-r test-pypi"
-          echo "POETRY_PUBLISH_OPTIONS=$(echo ${POETRY_PUBLISH_OPTIONS})" >> $GITHUB_ENV
-
-      - name: Publish to pypi/test-pypi
-        id: publish-to-pypi
-        run: |
-          echo ${{ env.POETRY_PUBLISH_OPTIONS }}
-          exit 1
-          #poetry publish -r test-pypi
+          poetry publish -r test-pypi
         continue-on-error: true
 
       - name: if publish to pypi failed revert main and delete release branch
