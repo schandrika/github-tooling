@@ -147,9 +147,9 @@ jobs:
             poetry version ${{ inputs.bump-rule }} --no-interaction
             
           else
-            # very first release. start with inputs.first-release-version
-            echo "First release. Setting tag as ${{ inputs.first-release-version }}"
-            current_tag=${{ inputs.first-release-version }}
+            # very first release. start with inputs.release-version
+            echo "First release. Setting tag as ${{ inputs.release-version }}"
+            current_tag=${{ inputs.release-version }}
             poetry version ${current_tag}
           fi
           
