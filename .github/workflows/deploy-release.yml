@@ -225,7 +225,7 @@ jobs:
       - name: Publish to test pypi
         id: publish-to-pypi
         run: |
-          echo "${POETRY_PUBLISH_OPTIONS}"
+          echo "${env.POETRY_PUBLISH_OPTIONS}"
           exit 1
           #poetry publish -r test-pypi
         continue-on-error: true
