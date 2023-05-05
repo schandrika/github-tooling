@@ -1,0 +1,235 @@
+name: Deploy Release Artifacts
+
+on:
+  workflow_call:
+    inputs:
+      merge-strategy:
+        description: 'Merge strategy and strategy options. Used only in case of merge conflicts'
+        required: false
+        default: ''
+        type: string
+      bump-rule:
+        description: 'Bump rule for computing next release version number. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
+        required: false
+        default: 'prerelease'
+        type: string
+      run-tests-wait:
+        description: 'Wait time to run test after merge to main'
+        required: false
+        default: 60
+        type: number
+    secrets:
+      git-token:
+        required: true
+      pypi-token:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  LANG: en_US.utf-8
+  LC_ALL: en_US.utf-8
+  PYTHON_VERSION: '3.10'
+
+jobs:
+
+  deploy-release:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write  # To push a branch
+      pull-requests: write  # To create a PR from that branch
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+
+      #----------------------------------------------
+      #       check-out repo and set-up python
+      #----------------------------------------------
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
+          token: ${{ secrets.git-token }}
+
+      - name: Do a git merge dry run
+        id: merge-dry-run
+        run: |
+          git config --global user.email "deploy-release-action@pnl.gov"
+          git config --global user.name "Deploy Release Github Action"
+          git checkout main
+          git merge --no-commit --no-ff develop
+        continue-on-error: true
+
+      - name: Abort merge dry-run
+        run: |
+          git merge --abort
+
+      - name: Check if merge had conflicts.
+        # if there is conflict and there is no merge strategy set then abort merge and exit
+        if: steps.merge-dry-run.outcome != 'success' && github.event.inputs.merge-strategy == ''
+        run: |
+          echo "merge strategy is ${{ inputs.merge-strategy }}"
+          echo "Merge to main has conflicts. Either do a manual merge and release or set input merge-strategy and re-run action"
+          exit 1
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        id: setup-python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      #----------------------------------------------
+      #  -----  install & configure poetry  -----
+      #----------------------------------------------
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.3
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      #----------------------------------------------
+      #       load cached venv if cache exists
+      #----------------------------------------------
+      - name: Load cached venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v3
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
+
+      #----------------------------------------------
+      # install dependencies if cache does not exist
+      #----------------------------------------------
+      - name: Install dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+        run: poetry install --no-interaction --no-root
+
+      #----------------------------------------------
+      # install your root project, if required
+      #----------------------------------------------
+      - name: Install library
+        run: |
+          git checkout develop
+          poetry install --no-interaction 
+
+      #----------------------------------------------
+      # bump version number for patch
+      #----------------------------------------------
+      - name: Bump Version
+        run: |
+          # current_tag is the last tagged release in the repository.   From there
+          # we need to remove the v from the beginning of the tag.
+          echo "Bump rule is ${{ inputs.bump-rule }}"
+          if ! $(git tag -l "v*" = ''); then
+            # uses -V which is version sort to keep it monotonically increasing.
+            current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
+            echo "current git tag is ${current_tag}"
+            current_tag=${current_tag#?}  
+            # current_tag is now the version we want to set our poetry version so
+            # that we can bump the version
+            poetry version ${current_tag}
+            poetry version ${{ inputs.bump-rule }} --no-interaction
+            
+          else
+            # very first release. start with 0.1.0rc0
+            echo "First release. Setting tag as 0.1.0rc0"
+            current_tag=0.1.0rc0
+            poetry version ${current_tag}
+          fi
+          
+          NEW_TAG=v$(poetry version --short)
+
+          # Finally because we want to be able to use the variable in later
+          # steps we set a NEW_TAG environmental variable
+          echo "NEW_TAG=$(echo ${NEW_TAG})" >> $GITHUB_ENV
+          # we don't want to update pyproject.toml yet. don't want this change to create merge conflict.
+          # we don't really persist right version in pyproject.toml to figure out the next version. we use git tags.
+          git restore pyproject.toml
+          
+
+      #--------------------------------------------------------------
+      # Create a new releases/new_tag
+      #--------------------------------------------------------------
+      - name: Create a new releases branch
+        run: |
+          git checkout -b releases/${NEW_TAG}
+          git push --set-upstream origin releases/${NEW_TAG}
+
+      #--------------------------------------------------------------
+      # merge changes back to main
+      #--------------------------------------------------------------
+      - name: Merge changes back to main
+        run: |
+          git checkout main
+          git merge ${{ inputs.merge-strategy }} releases/${NEW_TAG}
+          git push 
+
+      - name: Run tests on main branch
+        id: run-tests-on-main
+        run: |
+          poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
+        continue-on-error: true
+
+      - name: Do something with a failing build
+        if: steps.run-tests-on-main.outcome != 'success'
+        run: |
+          echo "tests on main did not succeed. Outcome is ${{ steps.run-tests-on-main.outcome }}"
+          git reset --hard HEAD~1 
+          git push origin HEAD --force
+          git branch -d releases/${NEW_TAG}
+          git push origin --delete releases/${NEW_TAG}
+          echo "reverted changes to main and removed release branch"
+          exit 1
+
+      - name: Create build artifacts
+        run: |
+          # set the right version in pyproject.toml before build and publish
+          poetry version ${NEW_TAG#?} 
+          poetry build -vvv 
+
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*.gz,dist/*.whl"
+          artifactErrorsFailBuild: true
+          generateReleaseNotes: true
+          commit: ${{ github.ref }}
+          # check bump-rule and set accordingly
+          prerelease: ${{ inputs.bump-rule == 'prerelease'  }}
+          tag: ${{ env.NEW_TAG }}
+          token: ${{ secrets.git-token }}
+
+      - name: Publish to test pypi
+        id: publish-to-pypi
+        run: |
+          poetry config repositories.test-pypi https://test.pypi.org/legacy/
+          poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
+          poetry publish -r test-pypi
+        continue-on-error: true
+
+      - name: if publish to pypi failed revert main and delete release branch
+        if: steps.publish-to-pypi.outcome != 'success'
+        run: |
+          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }}"
+          git reset --hard HEAD~1 
+          git push origin HEAD --force
+          git branch -d releases/${NEW_TAG}
+          git push origin --delete releases/${NEW_TAG}
+          echo "reverted changes to main and removed release branch"
+
+      - name: if publish to pypi failed delete release and tag on github
+        if: steps.publish-to-pypi.outcome != 'success'
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.git-token }}
+        with:
+          tag_name: ${{ env.NEW_TAG }}
+
+      - name: if publish to pypi failed delete release and tag on github
+        if: steps.publish-to-pypi.outcome != 'success'
+        run: |
+          exit 1
