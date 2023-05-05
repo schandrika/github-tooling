@@ -56,6 +56,10 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
+      - name: test
+        run: |
+          echo ${{ inputs }}
+          exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
