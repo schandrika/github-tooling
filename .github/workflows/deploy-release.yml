@@ -8,10 +8,10 @@ on:
         required: false
         default: ''
         type: string
-      first-release-version:
-        description: 'Version number to use if this is the first release'
+      release-version:
+        description: 'Version number to use. If not provided will start with 0.1.0rc0 and use bump-rule to get to next version'
         required: false
-        default: 0.1.0rc0
+        default: ''
         type: string
       bump-rule:
         description: 'Bump rule for computing next release version number. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
@@ -215,13 +215,13 @@ jobs:
           token: ${{ secrets.git-token }}
 
       - name: Setup to publish to pypi
-        if: inputs.publish-to-test-pypi == 'false'
+        if: github.event.inputs.publish-to-test-pypi == 'false'
         run: |
           echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
           poetry config pypi-token.pypi ${{ secrets.pypi-token }}
 
       - name: Setup to publish to test pypi
-        if:  inputs.publish-to-test-pypi == 'true'
+        if:  github.event.inputs.publish-to-test-pypi == 'true'
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
@@ -231,7 +231,7 @@ jobs:
       - name: Publish to pypi/test-pypi
         id: publish-to-pypi
         run: |
-          echo "${POETRY_PUBLISH_OPTIONS}"
+          echo ${{ env.POETRY_PUBLISH_OPTIONS }}
           exit 1
           #poetry publish -r test-pypi
         continue-on-error: true
