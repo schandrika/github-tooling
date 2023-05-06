@@ -56,6 +56,18 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
+      - name: Bump Version
+        run: |
+          # current_tag is the last tagged release in the repository.   From there
+          # we need to remove the v from the beginning of the tag.
+          echo "Bump rule is ${{ inputs.bump-rule }}"
+          echo "Given release version is ${{ inputs.release-version }}"
+          if ${{ inputs.release-version }} != '' ; then
+            echo "got version"
+          else
+            echo "compute version"
+          fi
+          exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
@@ -137,7 +149,7 @@ jobs:
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
           echo "Given release version is ${{ inputs.release-version }}"
-          if [ -z ${{ inputs.release-version }} ]; then
+          if ${{ inputs.release-version }} != '' ; then
             echo "Setting version given by user and ignoring bump rule - version= ${{ inputs.release-version }}"
             poetry version ${{ inputs.release-version }}
           else
