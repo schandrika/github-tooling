@@ -137,7 +137,7 @@ jobs:
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
           echo "Given release version is ${{ inputs.release-version }}"
-          if [ -z "${{ inputs.release-version }}" ]; then
+          if [ -z ${{ inputs.release-version }} ]; then
             echo "Setting version given by user and ignoring bump rule - version= ${{ inputs.release-version }}"
             poetry version ${{ inputs.release-version }}
           else
