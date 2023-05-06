@@ -232,7 +232,7 @@ jobs:
           poetry publish -r test-pypi2
         continue-on-error: true
 
-      - name: if publish to pypi failed revert main and delete release branch
+      - name: if publish to pypi/test-pypi failed revert main and delete release branch
         if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
         run: |
           echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }} ${{ steps.publish-to-test--pypi.outcome }}"
@@ -242,8 +242,8 @@ jobs:
           git push origin --delete releases/${NEW_TAG}
           echo "reverted changes to main and removed release branch"
 
-      - name: if publish to pypi failed delete release and tag on github
-        if: steps.publish-to-pypi.outcome != 'success'
+      - name: if publish to pypi/test-pypi failed delete release and tag on github
+        if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
         uses: dev-drprasad/delete-tag-and-release@v0.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.git-token }}
