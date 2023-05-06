@@ -9,12 +9,12 @@ on:
         default: ''
         type: string
       release-version:
-        description: 'Version number to use. If not provided will start with 0.1.0rc0 and use bump-rule to get to next version'
+        description: 'Version number to use. If provided bump-rule will be ignored'
         required: false
         default: ''
         type: string
       bump-rule:
-        description: 'Bump rule for computing next release version number. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
+        description: 'Bump rule for computing next release version number. Used when no release-version is given. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
         required: false
         default: 'prerelease'
         type: string
@@ -136,21 +136,27 @@ jobs:
           # current_tag is the last tagged release in the repository.   From there
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
-          if ! $(git tag -l "v*" = ''); then
-            # uses -V which is version sort to keep it monotonically increasing.
-            current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
-            echo "current git tag is ${current_tag}"
-            current_tag=${current_tag#?}  
-            # current_tag is now the version we want to set our poetry version so
-            # that we can bump the version
-            poetry version ${current_tag}
-            poetry version ${{ inputs.bump-rule }} --no-interaction
-            
+          echo "Given release version is ${{ inputs.release-version }}
+          if [ -z "${{ inputs.release-version }}" ]; then
+            echo "Setting version given by user and ignoring bump rule - version= ${{ inputs.release-version }}"
+            poetry version ${{ inputs.release-version }}
           else
-            # very first release. start with inputs.release-version
-            echo "First release. Setting tag as ${{ inputs.release-version }}"
-            current_tag=${{ inputs.release-version }}
-            poetry version ${current_tag}
+            if ! $(git tag -l "v*" = ''); then
+              # uses -V which is version sort to keep it monotonically increasing.
+              current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
+              echo "current git tag is ${current_tag}"
+              current_tag=${current_tag#?}  
+              # current_tag is now the version we want to set our poetry version so
+              # that we can bump the version
+              poetry version ${current_tag}
+              poetry version ${{ inputs.bump-rule }} --no-interaction
+              
+            else
+              # very first release. start with inputs.release-version
+              echo "First release. Setting tag as 0.1.0rc0"
+              current_tag='0.1.0rc0'
+              poetry version ${current_tag}
+            fi
           fi
           
           NEW_TAG=v$(poetry version --short)
@@ -235,7 +241,7 @@ jobs:
       - name: if publish to pypi/test-pypi failed revert main and delete release branch
         if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
         run: |
-          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }} ${{ steps.publish-to-test--pypi.outcome }}"
+          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }} ${{ steps.publish-to-test-pypi.outcome }}"
           git reset --hard HEAD~1 
           git push origin HEAD --force
           git branch -d releases/${NEW_TAG}
