@@ -62,7 +62,7 @@ jobs:
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
           echo "Given release version is ${{ inputs.release-version }}"
-          if ${{ inputs.release-version }} != '' ; then
+          if [ -z ${{ inputs.release-version }} ] ; then
             echo "got version"
           else
             echo "compute version"
