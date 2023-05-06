@@ -239,9 +239,9 @@ jobs:
         continue-on-error: true
 
       - name: if publish to pypi/test-pypi failed revert main and delete release branch
-        if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
+        if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success') }}
         run: |
-          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }} ${{ steps.publish-to-test-pypi.outcome }}"
+          echo "publish to pypi/test-pypi did not succeed. Outcome for pypi = ${{ steps.publish-to-pypi.outcome }} outcome for test-pypi= ${{ steps.publish-to-test-pypi.outcome }}"
           git reset --hard HEAD~1 
           git push origin HEAD --force
           git branch -d releases/${NEW_TAG}
