@@ -235,7 +235,7 @@ jobs:
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
-          poetry publish -r test-pypi2
+          poetry publish -r test-pypi
         continue-on-error: true
 
       - name: if publish to pypi/test-pypi failed revert main and delete release branch
