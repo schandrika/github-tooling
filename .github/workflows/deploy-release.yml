@@ -56,16 +56,6 @@ jobs:
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
-      - name: Bump Version
-        if: inputs.release-version != ''
-        run: |
-            echo "got version ${{ inputs.release-version }}"
-            exit 1
-      - name: Bump Version
-        if: inputs.release-version == ''
-        run: |
-          echo "use bump rule ${{ inputs.release-version }}"
-          exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
@@ -138,35 +128,46 @@ jobs:
           git checkout develop
           poetry install --no-interaction 
 
+      - name: Use given release-version number
+        if: inputs.release-version != ''
+        run: |
+          echo "Using given release version is ${{ inputs.release-version }}"
+          poetry version ${{ inputs.release-version }}
+
+          NEW_TAG=v$(poetry version --short)
+
+          # we want to be able to use the variable in later
+          # steps we set a NEW_TAG environmental variable
+          echo "NEW_TAG=$(echo ${NEW_TAG})" >> $GITHUB_ENV
+          # we don't want to update pyproject.toml yet. don't want this change to create merge conflict.
+          # we don't really persist right version in pyproject.toml to figure out the next version. we use git tags.
+          git restore pyproject.toml
+
       #----------------------------------------------
       # bump version number for patch
       #----------------------------------------------
       - name: Bump Version
+        if: inputs.release-version == ''
         run: |
           # current_tag is the last tagged release in the repository.   From there
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
           echo "Given release version is ${{ inputs.release-version }}"
-          if ${{ inputs.release-version }} != '' ; then
-            echo "Setting version given by user and ignoring bump rule - version= ${{ inputs.release-version }}"
-            poetry version ${{ inputs.release-version }}
+          if ! $(git tag -l "v*" = ''); then
+            # uses -V which is version sort to keep it monotonically increasing.
+            current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
+            echo "current git tag is ${current_tag}"
+            current_tag=${current_tag#?}  
+            # current_tag is now the version we want to set our poetry version so
+            # that we can bump the version
+            poetry version ${current_tag}
+            poetry version ${{ inputs.bump-rule }} --no-interaction
+            
           else
-            if ! $(git tag -l "v*" = ''); then
-              # uses -V which is version sort to keep it monotonically increasing.
-              current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
-              echo "current git tag is ${current_tag}"
-              current_tag=${current_tag#?}  
-              # current_tag is now the version we want to set our poetry version so
-              # that we can bump the version
-              poetry version ${current_tag}
-              poetry version ${{ inputs.bump-rule }} --no-interaction
-              
-            else
-              # very first release. start with inputs.release-version
-              echo "First release. Setting tag as 0.1.0rc0"
-              current_tag='0.1.0rc0'
-              poetry version ${current_tag}
-            fi
+            # very first release. start with inputs.release-version
+            echo "First release. Setting tag as 0.1.0rc0"
+            current_tag='0.1.0rc0'
+            poetry version ${current_tag}
           fi
           
           NEW_TAG=v$(poetry version --short)
