@@ -267,7 +267,7 @@ jobs:
         with:
           tag_name: ${{ env.NEW_TAG }}
 
-      - name: if publish to pypi failed delete release and tag on github
-        if: steps.publish-to-pypi.outcome != 'success'
+      - name: if publish to pypi/test-pypi failed exit with exit code 1
+        if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success' }}
         run: |
           exit 1
