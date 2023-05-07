@@ -57,14 +57,14 @@ jobs:
       - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
 
       - name: Bump Version
-        if: github.events.inputs.release-version != ''
+        if: inputs.release-version != ''
         run: |
-            echo "got version"
+            echo "got version ${{ inputs.release-version }}"
             exit 1
       - name: Bump Version
-        if: github.events.inputs.release-version == ''
+        if: inputs.release-version == ''
         run: |
-          echo "use bump rule"
+          echo "use bump rule ${{ inputs.release-version }}"
           exit 1
       #----------------------------------------------
       #       check-out repo and set-up python
