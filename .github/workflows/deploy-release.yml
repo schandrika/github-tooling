@@ -126,6 +126,7 @@ jobs:
       - name: Install library
         run: |
           git checkout develop
+          poetry lock --no-update
           poetry install --no-interaction 
 
       - name: Use given release-version number
