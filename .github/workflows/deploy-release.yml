@@ -8,13 +8,13 @@ on:
         required: false
         default: ''
         type: string
-      first-release-version:
-        description: 'Version number to use if this is the first release'
+      release-version:
+        description: 'Version number to use. If provided bump-rule will be ignored'
         required: false
-        default: 0.1.0rc0
+        default: ''
         type: string
       bump-rule:
-        description: 'Bump rule for computing next release version number. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
+        description: 'Bump rule for computing next release version number. Used when no release-version is given. Valid choices are: patch, minor, major, prepatch, preminor, premajor, prerelease'
         required: false
         default: 'prerelease'
         type: string
@@ -128,14 +128,31 @@ jobs:
           git checkout develop
           poetry install --no-interaction 
 
+      - name: Use given release-version number
+        if: inputs.release-version != ''
+        run: |
+          echo "Using given release version is ${{ inputs.release-version }}"
+          poetry version ${{ inputs.release-version }}
+
+          NEW_TAG=v$(poetry version --short)
+
+          # we want to be able to use the variable in later
+          # steps we set a NEW_TAG environmental variable
+          echo "NEW_TAG=$(echo ${NEW_TAG})" >> $GITHUB_ENV
+          # we don't want to update pyproject.toml yet. don't want this change to create merge conflict.
+          # we don't really persist right version in pyproject.toml to figure out the next version. we use git tags.
+          git restore pyproject.toml
+
       #----------------------------------------------
       # bump version number for patch
       #----------------------------------------------
       - name: Bump Version
+        if: inputs.release-version == ''
         run: |
           # current_tag is the last tagged release in the repository.   From there
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
+          echo "Given release version is ${{ inputs.release-version }}"
           if ! $(git tag -l "v*" = ''); then
             # uses -V which is version sort to keep it monotonically increasing.
             current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
@@ -147,9 +164,9 @@ jobs:
             poetry version ${{ inputs.bump-rule }} --no-interaction
             
           else
-            # very first release. start with inputs.first-release-version
-            echo "First release. Setting tag as ${{ inputs.first-release-version }}"
-            current_tag=${{ inputs.first-release-version }}
+            # very first release. start with inputs.release-version
+            echo "First release. Setting tag as 0.1.0rc0"
+            current_tag='0.1.0rc0'
             poetry version ${current_tag}
           fi
           
@@ -214,41 +231,43 @@ jobs:
           tag: ${{ env.NEW_TAG }}
           token: ${{ secrets.git-token }}
 
-      - name: Publish to test pypi
-        if: ${{ inputs.publish-to-test-pypi }}
+      - name: Publish to pypi
+        id: publish-to-pypi
+        if: ${{ ! inputs.publish-to-test-pypi }}
+        run: |
+          echo "POETRY_PUBLISH_OPTIONS=''" >> $GITHUB_ENV
+          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
+          poetry publish
+        continue-on-error: true
+
+      - name: Publish to test-pypi
+        id: publish-to-test-pypi
+        if: ${{ inputs.publish-to-test-pypi  }}
         run: |
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry config pypi-token.test-pypi ${{ secrets.pypi-token }}
-          POETRY_PUBLISH_OPTIONS= "-r test-pypi"
-          echo "POETRY_PUBLISH_OPTIONS=$(echo ${POETRY_PUBLISH_OPTIONS})" >> $GITHUB_ENV
-
-      - name: Publish to test pypi
-        id: publish-to-pypi
-        run: |
-          echo "${POETRY_PUBLISH_OPTIONS}"
-          exit 1
-          #poetry publish -r test-pypi
+          poetry publish -r test-pypi
         continue-on-error: true
 
-      - name: if publish to pypi failed revert main and delete release branch
-        if: steps.publish-to-pypi.outcome != 'success'
+      - name: if publish to pypi/test-pypi failed revert main and delete release branch
+        if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success' }}
         run: |
-          echo "publish to pypi did not succeed. Outcome is ${{ steps.publish-to-pypi.outcome }}"
+          echo "publish to pypi/test-pypi did not succeed. Outcome for pypi = ${{ steps.publish-to-pypi.outcome }} outcome for test-pypi= ${{ steps.publish-to-test-pypi.outcome }}"
           git reset --hard HEAD~1 
           git push origin HEAD --force
           git branch -d releases/${NEW_TAG}
           git push origin --delete releases/${NEW_TAG}
           echo "reverted changes to main and removed release branch"
 
-      - name: if publish to pypi failed delete release and tag on github
-        if: steps.publish-to-pypi.outcome != 'success'
+      - name: if publish to pypi/test-pypi failed delete release and tag on github
+        if: ${{ ! (steps.publish-to-pypi.outcome == 'success' || steps.publish-to-test-pypi.outcome == 'success') }}
         uses: dev-drprasad/delete-tag-and-release@v0.2.1
         env:
           GITHUB_TOKEN: ${{ secrets.git-token }}
         with:
           tag_name: ${{ env.NEW_TAG }}
 
-      - name: if publish to pypi failed delete release and tag on github
-        if: steps.publish-to-pypi.outcome != 'success'
+      - name: if publish to pypi/test-pypi failed exit with exit code 1
+        if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success' }}
         run: |
           exit 1
