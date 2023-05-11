@@ -272,3 +272,11 @@ jobs:
         if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success' }}
         run: |
           exit 1
+      #--------------------------------------------------------------
+      # merge changes back to develop
+      #--------------------------------------------------------------
+      - name: Merge changes back to develop
+        run: |
+          git checkout develop
+          git merge develop main
+          git push 
