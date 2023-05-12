@@ -188,9 +188,11 @@ jobs:
       - name: Run tests on main branch
         id: run-tests-on-main
         run: |
-          poetry add pytest-timeout --group dev
-          poetry install --no-interaction
-          poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
+          if [[ -d tests ]]; then
+            poetry add pytest-timeout --group dev
+            poetry install --no-interaction
+            poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
+          fi
         continue-on-error: true
 
       - name: Do something with a failing build
