@@ -188,6 +188,8 @@ jobs:
       - name: Run tests on main branch
         id: run-tests-on-main
         run: |
+          poetry add pytest-timeout --group dev
+          poetry install --no-interaction
           poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
         continue-on-error: true
 
@@ -206,7 +208,7 @@ jobs:
         run: |
           # set the right version in pyproject.toml before build and publish
           poetry version ${NEW_TAG#?} 
-          poetry build -vvv 
+          poetry build -vvv
 
       - uses: ncipollo/release-action@v1
         with:
