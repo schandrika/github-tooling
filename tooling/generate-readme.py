@@ -41,7 +41,8 @@ repositories = [
 ]
 
 link_pypi = '[![pypi version](https://img.shields.io/pypi/v/{repo}.svg)](https://pypi.org/project/{repo}/)'
-link_pytest = '[![Run Pytests develop](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=branch%3Adevelop++)'
+link_pytest = '[![Run Pytests develop](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=develop)'
+link2_pytest = '[![Run Pytests main](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/{repo}/actions/workflows/run-tests.yml?query=main)'
 
 with open(readme_path, 'w') as fp:
     fp.write(preamble)
@@ -55,4 +56,5 @@ with open(readme_path, 'w') as fp:
             pypi_name = repo
         fp.write(f"## {repo}\n\n")
         fp.write(link_pypi.format(repo=pypi_name) + "\n")
-        fp.write(link_pytest.format(repo=repo) + "\n\n")
+        fp.write(link_pytest.format(repo=repo) + "\n")
+        fp.write(link2_pytest.format(repo=repo) + "\n\n")
