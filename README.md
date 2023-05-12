@@ -3,7 +3,7 @@ VOLTTRON™ is an open source platform for distributed sensing and control. The 
 ## volttron-core
 
 [![pypi version](https://img.shields.io/pypi/v/volttron.svg)](https://pypi.org/project/volttron/)
-[![Run Pytests develop](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml?query=branch%3Adevelop++)
+[![Run Pytests](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml/badge.svg)](https://github.com/eclipse-volttron/volttron-core/actions/workflows/run-tests.yml)
 
 ## volttron-testing
 
