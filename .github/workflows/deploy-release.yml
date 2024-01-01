@@ -131,8 +131,10 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
-          if: ${inputs.release-version:0:1} == 'v'
-             inputs.release-version=${inputs.release-version#?}
+          if [[ ${inputs.release-version} == v* ]]; 
+          then
+              inputs.release-version=${inputs.release-version#?}
+          fi
           echo "Using given release version is ${{ inputs.release-version }}"
           poetry version ${{ inputs.release-version }}
           exit 1
