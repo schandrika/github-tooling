@@ -131,12 +131,13 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
-          if [[ ${inputs.release-version} == v* ]]; 
+          release-version=${{ inputs.release-version }}
+          if [[ ${release-version} == v* ]]; 
           then
-              inputs.release-version=${inputs.release-version#?}
+              release-version=${release-version#?}
           fi
-          echo "Using given release version is ${{ inputs.release-version }}"
-          poetry version ${{ inputs.release-version }}
+          echo "Using given release version is ${release-version}"
+          poetry version ${release-version}
           exit 1
           NEW_TAG=v$(poetry version --short)
 
