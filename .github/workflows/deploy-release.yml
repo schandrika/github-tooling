@@ -131,9 +131,11 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
+          if: ${inputs.release-version:0:1} == 'v'
+             inputs.release-version=${inputs.release-version#?}
           echo "Using given release version is ${{ inputs.release-version }}"
           poetry version ${{ inputs.release-version }}
-
+          exit 1
           NEW_TAG=v$(poetry version --short)
 
           # we want to be able to use the variable in later
