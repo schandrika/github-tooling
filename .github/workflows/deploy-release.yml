@@ -132,7 +132,7 @@ jobs:
         if: inputs.release-version != ''
         run: |
           release-version=${{ inputs.release-version }}
-          if [[ ${release-version} == v* ]]; 
+          if [[ $release-version == v* ]]; 
           then
               release-version=${release-version#?}
           fi
