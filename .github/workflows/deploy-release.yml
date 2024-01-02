@@ -119,11 +119,10 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
+          release_version=${{ inputs.release-version }}
           if [[ ${{ inputs.release-version }} == v* ]]; then
               release_version=${release_version#?}
-              echo "Trimming initial 'v' using version ${release_version}"
-          else
-              release_version=${{ inputs.release-version }}
+              echo "Trimming initial 'v'. Using version ${release_version}"
           fi
           echo "Using given release version  ${release_version}"
           poetry version ${release_version}
