@@ -132,6 +132,7 @@ jobs:
         if: inputs.release-version != ''
         run: |
           if [[ ${{ inputs.release-version }} == v* ]]; then
+              release_version=${{ inputs.release-version }}
               echo "in if condition ${release_version}"
               release_version=${release_version#?}
               echo "in if condition ${release_version}"
