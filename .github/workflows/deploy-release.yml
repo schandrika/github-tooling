@@ -132,15 +132,15 @@ jobs:
         if: inputs.release-version != ''
         run: |
           if [[ ${{ inputs.release-version }} == v* ]]; then
-              echo "in if condition ${release-version}"
-              release-version=${release-version#?}
-              echo "in if condition ${release-version}"
+              echo "in if condition ${release_version}"
+              release_version=${release_version#?}
+              echo "in if condition ${release_version}"
           else
-              release-version=${{inputs.release-version}}
-              echo "in else ${release-version}"
+              release_version=${{inputs.release-version}}
+              echo "in else ${release_version}"
           fi
           echo "Using given release version is ${release-version}"
-          poetry version ${release-version}
+          poetry version ${release_version}
           exit 1
           NEW_TAG=v$(poetry version --short)
 
