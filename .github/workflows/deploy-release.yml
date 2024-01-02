@@ -119,8 +119,14 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
-          echo "Using given release version is ${{ inputs.release-version }}"
-          poetry version ${{ inputs.release-version }}
+          if [[ ${{ inputs.release-version }} == v* ]]; then
+              release_version=${release_version#?}
+              echo "Trimming initial 'v' using version ${release_version}"
+          else
+              release_version=${{ inputs.release-version }}
+          fi
+          echo "Using given release version  ${release_version}"
+          poetry version ${release_version}
 
           NEW_TAG=v$(poetry version --short)
 
@@ -140,7 +146,6 @@ jobs:
           # current_tag is the last tagged release in the repository.   From there
           # we need to remove the v from the beginning of the tag.
           echo "Bump rule is ${{ inputs.bump-rule }}"
-          echo "Given release version is ${{ inputs.release-version }}"
           if ! $(git tag -l "v*" = ''); then
             # uses -V which is version sort to keep it monotonically increasing.
             current_tag=$(git tag -l "v*" | grep --invert-match '-' | sort --reverse -V  | sed -n 1p)
