@@ -131,12 +131,13 @@ jobs:
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
-          release-version=${{ inputs.release-version }}
-          if [[ $release-version == v* ]]; then
+          if [[ ${{ inputs.release-version }} == v* ]]; then
               echo "in if condition ${release-version}"
               release-version=${release-version#?}
               echo "in if condition ${release-version}"
-              
+          else
+              release-version=${{inputs.release-version}}
+              echo "in else ${release-version}"
           fi
           echo "Using given release version is ${release-version}"
           poetry version ${release-version}
