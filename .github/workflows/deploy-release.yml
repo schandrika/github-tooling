@@ -87,6 +87,10 @@ jobs:
           echo "Merge to main has conflicts. Either do a manual merge and release or set input merge-strategy and re-run action"
           exit 1
 
+      - name: Recheckout develop
+        run: |
+          git checkout develop
+
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         id: setup-python
         uses: actions/setup-python@v4
@@ -103,46 +107,21 @@ jobs:
           virtualenvs-in-project: true
           installer-parallel: true
 
-      #----------------------------------------------
-      #       load cached venv if cache exists
-      #----------------------------------------------
-      - name: Load cached venv
-        id: cached-poetry-dependencies
-        uses: actions/cache@v3
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-      #----------------------------------------------
-      # install dependencies if cache does not exist
-      #----------------------------------------------
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
 
       #----------------------------------------------
       # install your root project, if required
       #----------------------------------------------
       - name: Install library
         run: |
-          git checkout develop
+          poetry lock --no-update
           poetry install --no-interaction 
 
       - name: Use given release-version number
         if: inputs.release-version != ''
         run: |
-          if [[ ${{ inputs.release-version }} == v* ]]; then
-              release_version=${{ inputs.release-version }}
-              echo "in if condition ${release_version}"
-              release_version=${release_version#?}
-              echo "in if condition ${release_version}"
-          else
-              release_version=${{ inputs.release-version }}
-              echo "in else ${release_version}"
-          fi
-          echo "Using given release version is ${release_version}"
-          poetry version ${release_version}
-          exit 1
+          echo "Using given release version is ${{ inputs.release-version }}"
+          poetry version ${{ inputs.release-version }}
+
           NEW_TAG=v$(poetry version --short)
 
           # we want to be able to use the variable in later
@@ -209,7 +188,11 @@ jobs:
       - name: Run tests on main branch
         id: run-tests-on-main
         run: |
-          poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
+          if [[ -d tests ]]; then
+            poetry add pytest-timeout --group dev
+            poetry install --no-interaction
+            poetry run pytest --timeout=${{ inputs.run-tests-wait }} tests
+          fi
         continue-on-error: true
 
       - name: Do something with a failing build
@@ -227,7 +210,7 @@ jobs:
         run: |
           # set the right version in pyproject.toml before build and publish
           poetry version ${NEW_TAG#?} 
-          poetry build -vvv 
+          poetry build -vvv
 
       - uses: ncipollo/release-action@v1
         with:
@@ -280,3 +263,11 @@ jobs:
         if: ${{ steps.publish-to-pypi.outcome != 'success' && steps.publish-to-test-pypi.outcome != 'success' }}
         run: |
           exit 1
+      #--------------------------------------------------------------
+      # merge changes back to develop
+      #--------------------------------------------------------------
+      - name: Merge changes back to develop
+        run: |
+          git checkout develop
+          git merge develop main
+          git push 
