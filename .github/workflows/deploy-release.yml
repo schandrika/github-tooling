@@ -137,10 +137,10 @@ jobs:
               release_version=${release_version#?}
               echo "in if condition ${release_version}"
           else
-              release_version=${{inputs.release-version}}
+              release_version=${{ inputs.release-version }}
               echo "in else ${release_version}"
           fi
-          echo "Using given release version is ${release-version}"
+          echo "Using given release version is ${release_version}"
           poetry version ${release_version}
           exit 1
           NEW_TAG=v$(poetry version --short)
