@@ -1,0 +1,15 @@
+name: Test with latest volttron
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+
+defaults:
+  run:
+    shell: bash
+env:
+  PROJECT_NAME: AGENT-OR-LIBRARY-NAME
+
+jobs:
+  test-with-latest-volttron:
+    uses: eclipse-volttron/github-tooling/.github/workflows/test_with_latest_volttron@main
