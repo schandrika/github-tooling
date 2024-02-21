@@ -16,4 +16,4 @@ jobs:
     # call periodic tests only on develop. ideally we want this file to be only in develop so that github doesn't even
     # schedule this job on other branches.
     if: ${{ github.ref == 'refs/heads/develop' }}
-    uses: eclipse-volttron/github-tooling/.github/workflows/run-tests@main
+    uses: eclipse-volttron/github-tooling/.github/workflows/run-tests.yml@main

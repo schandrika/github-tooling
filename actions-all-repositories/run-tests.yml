@@ -27,4 +27,4 @@ env:
 
 jobs:
   test-with-latest-volttron:
-    uses: eclipse-volttron/github-tooling/.github/workflows/run-tests@main
+    uses: eclipse-volttron/github-tooling/.github/workflows/run-tests.yml@main
