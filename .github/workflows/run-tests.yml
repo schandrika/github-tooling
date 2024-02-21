@@ -1,4 +1,4 @@
-name: Periodic tests with latest volttron
+name: Run tests
 
 on:
   workflow_call:
@@ -24,6 +24,13 @@ jobs:
       #       check-out repo and set-up python
       #----------------------------------------------
       - name: Checkout code
+        if: ${{ github.event_name == 'schedule' }}
+        uses: actions/checkout@v4
+        with:
+          ref: develop
+
+      - name: Checkout code
+        if: ${{ github.event_name != 'schedule' }}
         uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python }}
