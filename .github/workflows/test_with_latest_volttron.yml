@@ -54,9 +54,6 @@ jobs:
       #----------------------------------------------
       - name: Install library and run tests
         run: |
-          echo "current dir is ${{ github.workspace }}"
-          files=$(ls)
-          echo "files are ${files}"
           pip install pytest
           poetry install --no-interaction
           poetry run pytest
