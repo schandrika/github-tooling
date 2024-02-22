@@ -23,7 +23,7 @@ jobs:
       #----------------------------------------------
       #       check-out repo and set-up python
       #----------------------------------------------
-      - name: Checkout code
+      - name: Checkout develop branch for periodic testing
         if: ${{ github.event_name == 'schedule' }}
         uses: actions/checkout@v4
         with:
