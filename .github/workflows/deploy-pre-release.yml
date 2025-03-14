@@ -33,9 +33,10 @@ jobs:
       #       check-out repo and set-up python
       #----------------------------------------------
       - name: Checkout code
-        uses: actions/checkout@v3.5.2
+        uses: actions/checkout@v4.2.2
         with:
           fetch-depth: 0
+          token: ${{ secrets.git-token }}
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         id: setup-python
@@ -59,7 +60,7 @@ jobs:
       #----------------------------------------------
       - name: Load cached venv
         id: cached-poetry-dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .venv
           key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
@@ -90,7 +91,6 @@ jobs:
         with:
           commit_message: bumped pre-release version to ${{ env.NEW_TAG }}
           branch: ${{ github.ref_name }}
-          github_token: ${{ secrets.git-token }}
 
 
       #---------------------------------------------------------------
