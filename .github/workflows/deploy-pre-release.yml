@@ -90,6 +90,8 @@ jobs:
         with:
           commit_message: bumped pre-release version to ${{ env.NEW_TAG }}
           branch: ${{ github.ref_name }}
+          github_token: ${{ secrets.git-token }}
+
 
       #---------------------------------------------------------------
       # create build artifacts to be included as part of release
