@@ -92,7 +92,6 @@ jobs:
           commit_message: bumped pre-release version to ${{ env.NEW_TAG }}
           branch: ${{ github.ref_name }}
 
-
       #---------------------------------------------------------------
       # create build artifacts to be included as part of release
       #---------------------------------------------------------------
@@ -100,18 +99,18 @@ jobs:
         run: |
           poetry build -vvv
 
-#      - uses: ncipollo/release-action@v1
-#        with:
-#          artifacts: "dist/*.gz,dist/*.whl"
-#          artifactErrorsFailBuild: true
-#          generateReleaseNotes: true
-#          commit: ${{ github.ref }}
-#          prerelease: true
-#          tag: ${{ env.NEW_TAG }}
-#          token: ${{ secrets.git-token }}
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "dist/*.gz,dist/*.whl"
+          artifactErrorsFailBuild: true
+          generateReleaseNotes: true
+          commit: ${{ github.ref }}
+          prerelease: true
+          tag: ${{ env.NEW_TAG }}
+          token: ${{ secrets.git-token }}
 
-#      - name: Publish pre-release to pypi
-#        if: github.repository_owner == "${{env.OWNER}}"
-#        run: |
-#          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
-#          poetry publish
+      - name: Publish pre-release to pypi
+        if: github.repository_owner == "${{env.OWNER}}"
+        run: |
+          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
+          poetry publish
