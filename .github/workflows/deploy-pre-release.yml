@@ -100,15 +100,15 @@ jobs:
         run: |
           poetry build -vvv
 
-      - uses: ncipollo/release-action@v1
-        with:
-          artifacts: "dist/*.gz,dist/*.whl"
-          artifactErrorsFailBuild: true
-          generateReleaseNotes: true
-          commit: ${{ github.ref }}
-          prerelease: true
-          tag: ${{ env.NEW_TAG }}
-          token: ${{ secrets.git-token }}
+#      - uses: ncipollo/release-action@v1
+#        with:
+#          artifacts: "dist/*.gz,dist/*.whl"
+#          artifactErrorsFailBuild: true
+#          generateReleaseNotes: true
+#          commit: ${{ github.ref }}
+#          prerelease: true
+#          tag: ${{ env.NEW_TAG }}
+#          token: ${{ secrets.git-token }}
 
 #      - name: Publish pre-release to pypi
 #        if: github.repository_owner == "${{env.OWNER}}"
