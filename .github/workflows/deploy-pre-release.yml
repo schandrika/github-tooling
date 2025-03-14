@@ -110,8 +110,8 @@ jobs:
           tag: ${{ env.NEW_TAG }}
           token: ${{ secrets.git-token }}
 
-      - name: Publish pre-release to pypi
-        if: github.repository_owner == "${{env.OWNER}}"
-        run: |
-          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
-          poetry publish
+#      - name: Publish pre-release to pypi
+#        if: github.repository_owner == "${{env.OWNER}}"
+#        run: |
+#          poetry config pypi-token.pypi ${{ secrets.pypi-token }}
+#          poetry publish
