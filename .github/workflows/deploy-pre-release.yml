@@ -3,11 +3,6 @@ name: Deploy Pre-Release Artifacts
 
 on:
   workflow_call:
-    secrets:
-      git-token:
-        required: true
-      pypi-token:
-        required: true
 
 defaults:
   run:
