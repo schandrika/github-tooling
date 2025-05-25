@@ -101,7 +101,6 @@ jobs:
           commit: ${{ github.ref }}
           prerelease: true
           tag: ${{ env.NEW_TAG }}
-          token: ${{ secrets.AUTO_PROJECT_PAT }}
 
 #      - name: Publish pre-release to pypi
 #        if: github.repository_owner == "${{env.OWNER}}"
