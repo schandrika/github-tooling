@@ -102,8 +102,14 @@ jobs:
           prerelease: true
           tag: ${{ env.NEW_TAG }}
 
-      - name: Publish pre-release to pypi
-        if: github.repository_owner == "${{env.OWNER}}"
-        run: |
-          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
+      - name: Publish package to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_TOKEN}}
+
+#      - name: Publish pre-release to pypi
+#        if: github.repository_owner == "${{env.OWNER}}"
+#        run: |
+#          poetry config pypi-token.pypi ${{ secrets.PYPI_TOKEN }}
 #          poetry publish
+
