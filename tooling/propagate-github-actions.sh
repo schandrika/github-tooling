@@ -9,5 +9,5 @@ REPLACE_FILE=$PARENT_PATH/actions-all-repositories/*
 
 ## Relative from any repos root
 FILE=.github/workflows
-
+mkdir -p $FILE
 cp $REPLACE_FILE $FILE
